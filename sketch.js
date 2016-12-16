@@ -1,6 +1,7 @@
 var ships;
 var sun;
 var walls;
+var obstacles;
 var numShips;
 var gravity;
 var step;
@@ -8,6 +9,7 @@ var maxSteps;
 var shipStartPostition;
 var sunPostition;
 var debug = true;
+var pathFinder;
 
 var gui;
 
@@ -18,13 +20,24 @@ function setup() {
   walls = new Group();
   createWalls();
 
+  // Obstacles
+  obstacles = new Group();
+  createObstacles();
+
   // Sun
   sunPostition = createVector(width / 2, 40);
   createSun();
+  
+  // Path Finder
+  pathFinder = new PathFinder();
+  pathFinder.createCostField();
+  pathFinder.createIntegrationField();
+  //pathFinder.drawIntegrationField();
 
   // Ships
   numShips = 1; 
   shipStartPostition = createVector(width / 2, height - 130);
+  shipStartPostition = createVector(width / 2 - 100, height - 130);
   ships = [];
   createShips();
 
@@ -37,7 +50,6 @@ function setup() {
   // GUI
   gui = createGui('Settings', 610, 10);
   gui.addGlobals('numShips');
-
 }
 
 function draw() {
@@ -66,6 +78,12 @@ function createWalls() {
   walls.add(wallLeft);
 }
 
+function createObstacles() {
+//  var obstacle = createSprite(width/2, height/2);
+//  obstacle.shapeColor = color(75);
+//  obstacles.add(obstacle);
+}
+
 function createSun() {
   sun = new Sun();
 }
@@ -73,69 +91,6 @@ function createSun() {
 function createShips() {
   for (var i = 0; i < numShips; i++) {
     ships.push(new Ship([
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 50},
-      {r: 4, l: 0, t: 50},
-      {r: 4, l: 0, t: 50},
-      {r: 4, l: 0, t: 50},
-      {r: 4, l: 0, t: 50},
-      {r: 4, l: 0, t: 50},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 1, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 100, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
       {r: 0, l: 4, t: 100},
       {r: 0, l: 4, t: 100},
       {r: 0, l: 4, t: 100},
