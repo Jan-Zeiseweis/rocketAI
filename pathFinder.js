@@ -1,128 +1,175 @@
 function PathFinder() {
-  this.gridSize = 100;
-  this.walker = createSprite(0, 0, this.gridSize, this.gridSize);
-  this.walker.debug = debug;
+	this.grid = new Grid();
 
-  this.createCostField = function() {
-    this.costField = new Grid();
-    for (var i = 0; i < this.costField.cells.length; i++) {
-      var cell = this.costField.cells[i];
-      this.walker.position.x = cell.position.x;
-      this.walker.position.y = cell.position.y;
-      cell.cost = 1;
-      if (this.walker.collide(obstacles)) {
-        cell.cost = 255;
-      }
-    }
-  };
+	this.findPath = function(startX, startY, endX, endY) {
+    console.log(startX, startY, endX, endY);
+		var openList = new BinaryHeap(function(node) {
+			return node.f;
+    }),
+      startNode = this.grid.getNodeAt(startX, startY),
+			endNode = this.grid.getNodeAt(endX, endY),
+			node, neighbors, neighbor, i, l, x, y, ng;
+    var grid = this.grid;
+		// set the `g` and `f` value of the start node to be 0
+		startNode.g = 0;
+		startNode.f = 0;
 
-  this.createIntegrationField = function() {
-    this.costField.cells.forEach(function(cell) {
-      cell.totalCost = 65535;
-    });
+		// push the start node into the open list
+		openList.push(startNode);
+		startNode.opened = true;
 
-    var openList = [];
-    var startNode = this.costField.cellAtPosition(sun.sprite.position);
-    startNode.totalCost = 0;
-    openList.push(startNode);
-    while (openList.length > 0) {
-      var currentCell = openList.shift();
-      currentCell.visited = true;
-      //console.log(currentCell.totalCost);
-      var neighbors = this.costField.neighbors(currentCell);
-      for (var i = 0; i < neighbors.length; i++) {
-        var neighbor = neighbors[i];
-        if (currentCell.totalCost + neighbor.cost < neighbor.totalCost) {
-          neighbor.totalCost = currentCell.totalCost + neighbor.cost;
-        }
-        if (!neighbor.visited) {
-          openList.push(neighbor);
-        }
-      }
-    }
-  };
+		// while the open list is not empty
+		while (!openList.empty()) {
+			// pop the position of node which has the minimum `f` value.
+			node = openList.pop();
+			node.closed = true;
 
-  this.drawIntegrationField = function() {
-    var maxTotalCost = 0;
-    var i;
-    var cell;
-    for (i = 0; i < this.costField.cells.length; i++) {
-      cell = this.costField.cells[i];
-      if (cell.totalCost > maxTotalCost) {
-        maxTotalCost = cell.totalCost;
-      }
-    }
+			// if reached the end position, construct the path and return it
+			if (node === endNode) {
+				return backtrace(endNode);
+			}
 
-    for (i = 0; i < this.costField.cells.length; i++) {
-      cell = this.costField.cells[i];
-      var sp = createSprite(cell.position.x, cell.position.y, this.gridSize, this.gridSize);
-      var spColor = map(cell.totalCost, 0, maxTotalCost, 255, 0);
-      console.log(cell.totalCost, spColor);
-      sp.shapeColor = color(spColor);
-    }
-  };
+			// get neigbours of the current node
+			neighbors = grid.getNeighbors(node);
+			for (i = 0, l = neighbors.length; i < l; ++i) {
+				neighbor = neighbors[i];
+
+				if (neighbor.closed) {
+					continue;
+				}
+
+				x = neighbor.x;
+				y = neighbor.y;
+
+				// get the distance between current node and the neighbor
+				// and calculate the next g score
+				ng = node.g + ((x - node.x === 0 || y - node.y === 0) ? 1 : Math.SQRT2);
+
+				// check if the neighbor has not been inspected yet, or
+				// can be reached with smaller cost from the current node
+				if (!neighbor.opened || ng < neighbor.g) {
+					neighbor.g = ng;
+					neighbor.h = neighbor.h || dist(x, y, endX, endY); //weight * heuristic(abs(x - endX), abs(y - endY));
+					neighbor.f = neighbor.g + neighbor.h;
+					neighbor.parent = node;
+
+					if (!neighbor.opened) {
+						openList.push(neighbor);
+						neighbor.opened = true;
+					} else {
+						// the neighbor can be reached with smaller cost.
+						// Since its f value has been updated, we have to
+						// update its position in the open list
+            openList.remove(neighbor);
+            openList.push(neighbor);
+						//openList.updateItem(neighbor);
+					}
+				}
+			} // end for each neighbor
+		} // end while not open list empty
+
+		// fail to find the path
+		return [];
+	}
 }
 
 function Grid() {
-  this.cells = [];
-  this.cellSize = 100;
-  this.cols = floor(width/this.cellSize);
-  this.rows = floor(height/this.cellSize);
-
-  this.gridIndexToPosition = function(col, row) {
-    var x = col * this.cellSize + this.cellSize / 2;
-    var y = row * this.cellSize + this.cellSize / 2;
-    var position = {x: x, y: y};
-    return position;
-  };
-
-  for (var row = 0; row < this.rows; row++) {
-    for (var col = 0; col < this.cols; col++) {
-      var cell = {};
-      cell.position = this.gridIndexToPosition(col, row);
-      cell.gridIndex = {col: col,row: row};
-      this.cells.push(cell);
+	this.buildNodes = function() {
+		var nodes = [];
+    for (i = 0; i < width; ++i) {
+      nodes[i] = new Array(height);
+      for (j = 0; j < height; ++j) {
+        nodes[i][j] = new Node(i, j);
+      }
     }
+		return nodes;
+	};
+	this.nodes = this.buildNodes();
+
+
+	this.getNodeAt = function(x, y) {
+		return this.nodes[x][y];
+	};
+
+	this.getNeighbors = function(node) {
+		var x = node.x,
+			y = node.y,
+			neighbors = [],
+			s0 = false, d0 = false,
+			s1 = false, d1 = false,
+			s2 = false, d2 = false,
+			s3 = false, d3 = false,
+			nodes = this.nodes;
+
+		// ↑
+		if (this.isWalkableAt(x, y - 1)) {
+			neighbors.push(nodes[y - 1][x]);
+			s0 = true;
+		}
+		// →
+		if (this.isWalkableAt(x + 1, y)) {
+			neighbors.push(nodes[y][x + 1]);
+			s1 = true;
+		}
+		// ↓
+		if (this.isWalkableAt(x, y + 1)) {
+			neighbors.push(nodes[y + 1][x]);
+			s2 = true;
+		}
+		// ←
+		if (this.isWalkableAt(x - 1, y)) {
+			neighbors.push(nodes[y][x - 1]);
+			s3 = true;
+		}
+		d0 = s3 && s0;
+		d1 = s0 && s1;
+		d2 = s1 && s2;
+		d3 = s2 && s3;
+
+		// ↖
+		if (d0 && this.isWalkableAt(x - 1, y - 1)) {
+			neighbors.push(nodes[y - 1][x - 1]);
+		}
+		// ↗
+		if (d1 && this.isWalkableAt(x + 1, y - 1)) {
+			neighbors.push(nodes[y - 1][x + 1]);
+		}
+		// ↘
+		if (d2 && this.isWalkableAt(x + 1, y + 1)) {
+			neighbors.push(nodes[y + 1][x + 1]);
+		}
+		// ↙
+		if (d3 && this.isWalkableAt(x - 1, y + 1)) {
+			neighbors.push(nodes[y + 1][x - 1]);
+		}
+
+		return neighbors;
+	};
+
+	this.isWalkableAt = function(x ,y) {
+		return this.isInside(x, y) && this.nodes[y][x].walkable;
+	};
+
+	this.isInside = function(x, y) {
+		return (x >= 0 && x < width) && (y >= 0 && y < height);
+	};
+
+	this.setWalkableAt = function(x,y) {
+		this.nodes[y][x].walkable = walkable;
+	};
+}
+
+function Node(x, y, walkable) {
+	this.x = x;
+	this.y = y;
+	this.walkable = (walkable === undefined ? true : walkable);
+}
+
+function backtrace(node) {
+  var path = [[node.x, node.y]];
+  while (node.parent) {
+    node = node.parent;
+    path.push([node.x, node.y]);
   }
-
-  this.cellAtColRow = function(col, row) {
-    var gridIndex = col + row * this.cols;
-    if (gridIndex < this.cells.length) {
-      return this.cells[gridIndex];
-    }
-  };
-
-  this.gridIndexAtPosition = function(position) {
-    var col = floor(position.x / this.cellSize);
-    var row = floor(position.y / this.cellSize);
-    return {col: col, row: row};
-  };
-
-  this.cellAtPosition = function(position) {
-    var gridIndex = this.gridIndexAtPosition(position);
-    return this.cellAtColRow(gridIndex.col, gridIndex.row);
-  };
-
-  this.neighbors = function(cell) {
-    var neighbors = [];
-    var col = cell.gridIndex.col;
-    var row = cell.gridIndex.row;
-    var top    = this.cellAtColRow(col    , row - 1);
-    var right  = this.cellAtColRow(col + 1, row    );
-    var bottom = this.cellAtColRow(col    , row + 1);
-    var left   = this.cellAtColRow(col - 1, row    );
-    if (top) {
-      neighbors.push(top);
-    }
-    if (right) {
-      neighbors.push(right);
-    }
-    if (bottom) {
-      neighbors.push(bottom);
-    }
-    if (left) {
-      neighbors.push(left);
-    }
-    return neighbors;
-  };
+  return path.reverse();
 }

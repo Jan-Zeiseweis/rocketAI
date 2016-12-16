@@ -8,7 +8,8 @@ var step;
 var maxSteps;
 var shipStartPostition;
 var sunPostition;
-var debug = true;
+var debug = false;
+var path;
 var pathFinder;
 
 var gui;
@@ -28,18 +29,24 @@ function setup() {
   sunPostition = createVector(width / 2, 40);
   createSun();
   
-  // Path Finder
-  pathFinder = new PathFinder();
-  pathFinder.createCostField();
-  pathFinder.createIntegrationField();
-  //pathFinder.drawIntegrationField();
-
   // Ships
   numShips = 1; 
   shipStartPostition = createVector(width / 2, height - 130);
   shipStartPostition = createVector(width / 2 - 100, height - 130);
   ships = [];
   createShips();
+
+  // Path Finder
+  if (numShips > 0) {
+    pathFinder = new PathFinder();
+    path = pathFinder.findPath(
+      shipStartPostition.x, shipStartPostition.y, sunPostition.x, sunPostition.y);
+    for ( var i = 0; i < path.length; i++) {
+      if (i % 1 === 0) {
+        createSprite(path[i][0], path[i][1], 5, 5);
+      }
+    }
+  }
 
   // Gravity
   gravity = { force: 0.1, direction: 90 };
