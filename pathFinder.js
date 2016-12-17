@@ -1,8 +1,8 @@
 function PathFinder() {
 	this.grid = new Grid();
 
+
 	this.findPath = function(startX, startY, endX, endY) {
-    console.log(startX, startY, endX, endY);
 		var openList = new BinaryHeap(function(node) {
 			return node.f;
     }),
@@ -73,106 +73,6 @@ function PathFinder() {
 	}
 }
 
-function Grid() {
-	this.buildNodes = function() {
-		var nodes = [];
-    for (i = 0; i < width; ++i) {
-      nodes[i] = new Array(height);
-      for (j = 0; j < height; ++j) {
-        nodes[i][j] = new Node(i, j);
-      }
-    }
-		return nodes;
-	};
-	this.nodes = this.buildNodes();
-
-
-	this.getNodeAt = function(x, y) {
-		return this.nodes[x][y];
-	};
-
-	this.getNeighbors = function(node) {
-		var x = node.x,
-			y = node.y,
-			neighbors = [],
-			s0 = false, d0 = false,
-			s1 = false, d1 = false,
-			s2 = false, d2 = false,
-			s3 = false, d3 = false,
-			nodes = this.nodes;
-
-		// ↑
-		if (this.isWalkableAt(x, y - 1)) {
-			neighbors.push(nodes[x][y - 1]);
-			s0 = true;
-		}
-		// →
-		if (this.isWalkableAt(x + 1, y)) {
-			neighbors.push(nodes[x + 1][y]);
-			s1 = true;
-		}
-		// ↓
-		if (this.isWalkableAt(x, y + 1)) {
-			neighbors.push(nodes[x][y + 1]);
-			s2 = true;
-		}
-		// ←
-		if (this.isWalkableAt(x - 1, y)) {
-			neighbors.push(nodes[x - 1][y]);
-			s3 = true;
-		}
-		d0 = s3 && s0;
-		d1 = s0 && s1;
-		d2 = s1 && s2;
-		d3 = s2 && s3;
-
-		// ↖
-		if (d0 && this.isWalkableAt(x - 1, y - 1)) {
-			neighbors.push(nodes[x - 1][y - 1]);
-		}
-		// ↗
-		if (d1 && this.isWalkableAt(x + 1, y - 1)) {
-			neighbors.push(nodes[x + 1][y - 1]);
-		}
-		// ↘
-		if (d2 && this.isWalkableAt(x + 1, y + 1)) {
-			neighbors.push(nodes[x + 1][y + 1]);
-		}
-		// ↙
-		if (d3 && this.isWalkableAt(x - 1, y + 1)) {
-			neighbors.push(nodes[x - 1][y + 1]);
-		}
-
-		return neighbors;
-	};
-
-	this.isWalkableAt = function(x ,y) {
-		return this.isInside(x, y) && this.nodes[y][x].walkable;
-	};
-
-	this.isInside = function(x, y) {
-		return (x >= 0 && x < width) && (y >= 0 && y < height);
-	};
-
-	this.setWalkableAt = function(x,y) {
-		this.nodes[y][x].walkable = walkable;
-	};
-}
-
-function Node(x, y, walkable) {
-	this.x = x;
-	this.y = y;
-	this.walkable = (walkable === undefined ? true : walkable);
-}
-
-function backtrace(node) {
-  var path = [[node.x, node.y]];
-  while (node.parent) {
-    node = node.parent;
-    path.push([node.x, node.y]);
-  }
-  return path.reverse();
-}
 
 function heuristic(dx, dy) {
   var F = Math.SQRT2 - 1;

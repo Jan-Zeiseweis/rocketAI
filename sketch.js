@@ -89,6 +89,7 @@ function createWalls() {
 function createObstacles() {
   var obstacle = createSprite(width/2, height/2);
   obstacle.shapeColor = color(75);
+  obstacle.immovable = true;
   obstacles.add(obstacle);
 }
 

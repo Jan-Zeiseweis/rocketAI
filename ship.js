@@ -24,6 +24,7 @@ function Ship(dna) {
     this.sprite.bounce(walls, this.hitWall);
     if (this.sprite.sunHitCounter < 5) {
       this.sprite.addSpeed(gravity.force, gravity.direction);
+      this.sprite.bounce(obstacles);
       this.sprite.overlap(sun.sprite, this.hitSun);
       this.handleKeyboardInput();
       this.handleDNAInput();
