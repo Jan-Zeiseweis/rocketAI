@@ -11,6 +11,7 @@ var sunPostition;
 var debug = false;
 var path;
 var pathFinder;
+var numObstacles;
 
 var gui;
 
@@ -23,6 +24,7 @@ function setup() {
 
   // Obstacles
   obstacles = new Group();
+  numObstacles = 10;
   createObstacles();
 
   // Sun
@@ -40,12 +42,8 @@ function setup() {
     pathFinder = new PathFinder();
     path = pathFinder.findPath(
       shipStartPostition.x, shipStartPostition.y, sunPostition.x, sunPostition.y);
-    for ( var i = 0; i < path.length; i++) {
-      if (i % 5 === 0) {
-        var sp = createSprite(path[i][0], path[i][1], 1, 1);
-        sp.shapeColor = color(255);
-
-      }
+    if (debug) {
+      pathFinder.drawPath(path);
     }
   }
 
@@ -87,10 +85,13 @@ function createWalls() {
 }
 
 function createObstacles() {
-  var obstacle = createSprite(width/2, height/2);
-  obstacle.shapeColor = color(75);
-  obstacle.immovable = true;
-  obstacles.add(obstacle);
+  for (var i = 0; i < numObstacles; i++) {
+    var obstacle = createSprite(random(width), random(height), 50, 20);
+    obstacle.shapeColor = color(75);
+    obstacle.immovable = true;
+    obstacles.add(obstacle);
+  }
+
 }
 
 function createSun() {

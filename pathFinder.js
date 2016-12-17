@@ -71,6 +71,15 @@ function PathFinder() {
 		// fail to find the path
 		return [];
 	}
+  this.drawPath = function(path) {
+    for ( var i = 0; i < path.length; i++) {
+      if (i % 5 === 0) {
+        var sp = createSprite(path[i][0], path[i][1], 1, 1);
+        sp.shapeColor = color(255);
+
+      }
+    }
+  }
 }
 
 
