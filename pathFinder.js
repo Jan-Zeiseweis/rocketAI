@@ -49,7 +49,7 @@ function PathFinder() {
 				// can be reached with smaller cost from the current node
 				if (!neighbor.opened || ng < neighbor.g) {
 					neighbor.g = ng;
-					neighbor.h = neighbor.h || dist(x, y, endX, endY); //weight * heuristic(abs(x - endX), abs(y - endY));
+					neighbor.h = neighbor.h || heuristic(abs(x - endX), abs(y - endY));
 					neighbor.f = neighbor.g + neighbor.h;
 					neighbor.parent = node;
 
@@ -103,22 +103,22 @@ function Grid() {
 
 		// ↑
 		if (this.isWalkableAt(x, y - 1)) {
-			neighbors.push(nodes[y - 1][x]);
+			neighbors.push(nodes[x][y - 1]);
 			s0 = true;
 		}
 		// →
 		if (this.isWalkableAt(x + 1, y)) {
-			neighbors.push(nodes[y][x + 1]);
+			neighbors.push(nodes[x + 1][y]);
 			s1 = true;
 		}
 		// ↓
 		if (this.isWalkableAt(x, y + 1)) {
-			neighbors.push(nodes[y + 1][x]);
+			neighbors.push(nodes[x][y + 1]);
 			s2 = true;
 		}
 		// ←
 		if (this.isWalkableAt(x - 1, y)) {
-			neighbors.push(nodes[y][x - 1]);
+			neighbors.push(nodes[x - 1][y]);
 			s3 = true;
 		}
 		d0 = s3 && s0;
@@ -128,19 +128,19 @@ function Grid() {
 
 		// ↖
 		if (d0 && this.isWalkableAt(x - 1, y - 1)) {
-			neighbors.push(nodes[y - 1][x - 1]);
+			neighbors.push(nodes[x - 1][y - 1]);
 		}
 		// ↗
 		if (d1 && this.isWalkableAt(x + 1, y - 1)) {
-			neighbors.push(nodes[y - 1][x + 1]);
+			neighbors.push(nodes[x + 1][y - 1]);
 		}
 		// ↘
 		if (d2 && this.isWalkableAt(x + 1, y + 1)) {
-			neighbors.push(nodes[y + 1][x + 1]);
+			neighbors.push(nodes[x + 1][y + 1]);
 		}
 		// ↙
 		if (d3 && this.isWalkableAt(x - 1, y + 1)) {
-			neighbors.push(nodes[y + 1][x - 1]);
+			neighbors.push(nodes[x - 1][y + 1]);
 		}
 
 		return neighbors;
@@ -173,3 +173,10 @@ function backtrace(node) {
   }
   return path.reverse();
 }
+
+function heuristic(dx, dy) {
+  var F = Math.SQRT2 - 1;
+  return (dx < dy) ? F * dx + dy : F * dy + dx;
+
+}
+

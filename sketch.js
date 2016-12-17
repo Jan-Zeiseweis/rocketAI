@@ -32,7 +32,6 @@ function setup() {
   // Ships
   numShips = 1; 
   shipStartPostition = createVector(width / 2, height - 130);
-  shipStartPostition = createVector(width / 2 - 100, height - 130);
   ships = [];
   createShips();
 
@@ -42,14 +41,16 @@ function setup() {
     path = pathFinder.findPath(
       shipStartPostition.x, shipStartPostition.y, sunPostition.x, sunPostition.y);
     for ( var i = 0; i < path.length; i++) {
-      if (i % 1 === 0) {
-        createSprite(path[i][0], path[i][1], 5, 5);
+      if (i % 5 === 0) {
+        var sp = createSprite(path[i][0], path[i][1], 1, 1);
+        sp.shapeColor = color(255);
+
       }
     }
   }
 
   // Gravity
-  gravity = { force: 0.1, direction: 90 };
+  gravity = { force: 0.0, direction: 90 };
 
   step = 0;
   maxSteps = 400;
@@ -86,9 +87,9 @@ function createWalls() {
 }
 
 function createObstacles() {
-//  var obstacle = createSprite(width/2, height/2);
-//  obstacle.shapeColor = color(75);
-//  obstacles.add(obstacle);
+  var obstacle = createSprite(width/2, height/2);
+  obstacle.shapeColor = color(75);
+  obstacles.add(obstacle);
 }
 
 function createSun() {
@@ -97,16 +98,7 @@ function createSun() {
 
 function createShips() {
   for (var i = 0; i < numShips; i++) {
-    ships.push(new Ship([
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 0, l: 4, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-      {r: 4, l: 0, t: 100},
-    ]));
+    ships.push(new Ship());
   }
 }
 
