@@ -8,7 +8,7 @@ var step;
 var maxSteps;
 var shipStartPostition;
 var sunPostition;
-var debug = false;
+var debug = true;
 var path;
 var pathFinder;
 var numObstacles;
@@ -24,7 +24,7 @@ function setup() {
 
   // Obstacles
   obstacles = new Group();
-  numObstacles = 10;
+  numObstacles = 5;
   createObstacles();
 
   // Sun
@@ -86,12 +86,12 @@ function createWalls() {
 
 function createObstacles() {
   for (var i = 0; i < numObstacles; i++) {
-    var obstacle = createSprite(random(width), random(height), 50, 20);
+    var obstacle = createSprite(random(width), random(height), 100, 20);
     obstacle.shapeColor = color(75);
     obstacle.immovable = true;
+    obstacle.debug = debug;
     obstacles.add(obstacle);
   }
-
 }
 
 function createSun() {

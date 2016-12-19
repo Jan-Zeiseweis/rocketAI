@@ -1,5 +1,7 @@
 function Grid() {
-  this.walker = createSprite(0,0,0,0);
+  // should have the ships size.
+  this.walker = createSprite(0,0,20,20);
+  this.walker.setCollider('circle', 0, 0, 100);
   this.buildNodes = function() {
     var nodes = [];
     for (i = 0; i < width; ++i) {
