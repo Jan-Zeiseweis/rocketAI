@@ -12,6 +12,7 @@ var debug = true;
 var path;
 var pathFinder;
 var numObstacles;
+var population;
 
 var gui;
 
@@ -24,7 +25,7 @@ function setup() {
 
   // Obstacles
   obstacles = new Group();
-  numObstacles = 5;
+  numObstacles = 1;
   createObstacles();
 
   // Sun
@@ -35,7 +36,12 @@ function setup() {
   numShips = 1; 
   shipStartPostition = createVector(width / 2, height - 130);
   ships = [];
-  createShips();
+
+
+  // Population
+  population = new Population();
+
+  //createShips();
 
   // Path Finder
   if (numShips > 0) {
@@ -48,7 +54,7 @@ function setup() {
   }
 
   // Gravity
-  gravity = { force: 0.0, direction: 90 };
+  gravity = { force: 0.1, direction: 90 };
 
   step = 0;
   maxSteps = 400;

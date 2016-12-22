@@ -1,7 +1,7 @@
 function Grid() {
   // should have the ships size.
   this.walker = createSprite(0,0,20,20);
-  this.walker.setCollider('circle', 0, 0, 100);
+  this.walker.setCollider('rectangle', 0, 0, 10, 10);
   this.buildNodes = function() {
     var nodes = [];
     for (i = 0; i < width; ++i) {
@@ -13,10 +13,10 @@ function Grid() {
         node.walkable = true;
         for (var k = 0; k < obstacles.length; k++) {
           var obstacle = obstacles[k];
-          if (node.x >= obstacle.position.x - obstacle.width / 2 &&
-            node.x <= obstacle.position.x + obstacle.width / 2 &&
-              node.y >= obstacle.position.y - obstacle.height / 2 &&
-              node.y <= obstacle.position.y + obstacle.height / 2) {
+          if (node.x + 10 >= obstacle.position.x - obstacle.width / 2 &&
+              node.x - 10 <= obstacle.position.x + obstacle.width / 2 &&
+              node.y + 10 >= obstacle.position.y - obstacle.height / 2 &&
+              node.y - 10 <= obstacle.position.y + obstacle.height / 2) {
                 node.walkable = false;
                 break;
               }
@@ -36,13 +36,13 @@ function Grid() {
 
   this.getNeighbors = function(node) {
     var x = node.x,
-      y = node.y,
-      neighbors = [],
-      s0 = false, d0 = false,
-      s1 = false, d1 = false,
-      s2 = false, d2 = false,
-      s3 = false, d3 = false,
-      nodes = this.nodes;
+        y = node.y,
+        neighbors = [],
+        s0 = false, d0 = false,
+        s1 = false, d1 = false,
+        s2 = false, d2 = false,
+        s3 = false, d3 = false,
+        nodes = this.nodes;
 
     // ↑
     if (this.isWalkableAt(x, y - 1)) {
